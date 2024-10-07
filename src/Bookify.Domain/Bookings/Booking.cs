@@ -1,3 +1,5 @@
+using System.IO.Pipelines;
+
 namespace Bookify.Domain;
 
 public sealed class Booking : Entity {
@@ -67,6 +69,53 @@ public sealed class Booking : Entity {
 
         return booking;
 
+
+    }
+    public Result Confirm() {
+        if ( Status != BookingStatus.Reserved ) 
+            return Result.Failure(BookingErrors.NotReserved);
+
+        Status = BookingStatus.Confirmed;
+        ConfirmedOnUtc = DateTime.UtcNow;
+        RaiseDomainEvent(new BookingConfirmedDomainEvent(Id));
+
+        return Result.Success();
+    }
+
+    public Result Reject() {
+        if ( Status != BookingStatus.Reserved ) 
+            return Result.Failure(BookingErrors.NotReserved);
+        
+        Status = BookingStatus.Rejected;
+        RejectedOnUtc = DateTime.UtcNow;
+
+        RaiseDomainEvent(new BookingRejectedDomainEvent(Id));
+
+        return Result.Success();
+    }
+
+    public Result Cancel() {
+        if ( Status != BookingStatus.Reserved ) 
+            return Result.Failure(BookingErrors.NotReserved);
+        
+        Status = BookingStatus.Cancelled;
+        CancelledOnUtc = DateTime.UtcNow;
+
+        RaiseDomainEvent(new BookingCancelledDomainEvent(Id));
+
+        return Result.Success();
+    }
+
+    public Result Complete() {
+        if ( Status != BookingStatus.Reserved ) 
+            return Result.Failure(BookingErrors.NotReserved);
+        
+        Status = BookingStatus.Completed;
+        CompletedOnUtc = DateTime.UtcNow;
+
+        RaiseDomainEvent(new BookingCompletedDomainEvent(Id));
+
+        return Result.Success();
     }
 
 }
