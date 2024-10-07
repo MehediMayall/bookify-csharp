@@ -9,4 +9,5 @@ public  record Money(decimal Amount, Currency Currency) {
     }
 
     public static Money Zero(Currency currency) => new(0, currency);
+    public bool IsZero() => Amount == 0;
 }
