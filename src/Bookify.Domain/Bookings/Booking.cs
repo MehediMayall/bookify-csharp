@@ -67,9 +67,8 @@ public sealed class Booking : Entity {
             utcNow
         );
 
+        booking.RaiseDomainEvent(new BookingReservedDomainEvent(booking.Id));
         return booking;
-
-
     }
     public Result Confirm() {
         if ( Status != BookingStatus.Reserved ) 

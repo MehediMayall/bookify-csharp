@@ -41,6 +41,7 @@ public sealed class ReserveBookingCommandHandler : ICommandHandler<ReserveBookin
 
         var duration = DateRange.Create(request.StartDate, request.EndDate);   
 
+        // Checking optimistic checking
         if ( await bookingRepository.IsOverlappingAsync(apartment.Id, duration, cancellationToken) ) {
             return Result.Failure<Guid>(BookingErrors.OverLap);
         }
